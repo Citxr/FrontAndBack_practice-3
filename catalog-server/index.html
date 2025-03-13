@@ -15,7 +15,6 @@
         h1 {
             text-align: center;
             color: #444;
-            margin-bottom: 30px;
         }
         .products-container {
             display: flex;
@@ -40,10 +39,6 @@
             color: #007bff;
             font-size: 1.5em;
         }
-        .product-card p {
-            margin: 5px 0;
-            color: #666;
-        }
         .product-card .price {
             font-size: 1.2em;
             font-weight: bold;
@@ -53,15 +48,60 @@
             font-style: italic;
             color: #6c757d;
         }
-        .product-card .description {
-            margin-top: 10px;
-            line-height: 1.5;
+
+        .chat-container {
+            margin-top: 40px;
+            padding: 20px;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+        .chat-container h2 {
+            margin-top: 0;
+            color: #444;
+        }
+        #chat-messages {
+            height: 200px;
+            overflow-y: auto;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            padding: 10px;
+            margin-bottom: 10px;
+            background: #f9f9f9;
+        }
+        #chat-input {
+            width: calc(100% - 90px);
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+        button {
+            width: 80px;
+            padding: 10px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #0056b3;
         }
     </style>
 </head>
 <body>
     <h1>Каталог товаров</h1>
     <div class="products-container" id="products"></div>
+
+    <div class="chat-container">
+        <h2>Чат поддержки</h2>
+        <div id="chat-messages"></div>
+        <input type="text" id="chat-input" placeholder="Введите сообщение..." />
+        <button onclick="sendMessage()">Отправить</button>
+    </div>
 
     <script>
         fetch('/products')
@@ -83,6 +123,76 @@
             .catch(error => {
                 console.error('Ошибка при загрузке товаров:', error);
             });
+
+        const query = `
+            query {
+                products {
+                    name
+                    price
+                }
+            }
+        `;
+
+        fetch('http://localhost:4000/graphql', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ query }),
+        })
+            .then(response => response.json())
+            .then(data => {
+                const productsContainer = document.getElementById('products');
+                data.data.products.forEach(product => {
+                    const card = document.createElement('div');
+                    card.className = 'product-card';
+                    card.innerHTML = `
+                        <h3>${product.name}</h3>
+                        <p class="price">${product.price} руб.</p>
+                    `;
+                    productsContainer.appendChild(card);
+                });
+            })
+            .catch(error => {
+                console.error('Ошибка при загрузке товаров:', error);
+            });
+
+
+    const ws = new WebSocket('ws://localhost:8081');
+
+    ws.onmessage = (event) => {
+        const chatMessages = document.getElementById('chat-messages');
+        if (chatMessages) {
+            try {
+                const data = JSON.parse(event.data);
+
+                const message = document.createElement('div');
+                message.textContent = `${data.sender}: ${data.message}`;
+
+                chatMessages.appendChild(message);
+                chatMessages.scrollTop = chatMessages.scrollHeight;
+            } catch (error) {
+                console.error('Ошибка при парсинге сообщения:', error);
+            }
+        } else {
+            console.error('Элемент #chat-messages не найден');
+        }
+    };
+
+    function sendMessage() {
+        const input = document.getElementById('chat-input');
+        if (input) {
+            const message = input.value;
+            if (message) {
+                ws.send(JSON.stringify({
+                    sender: "Пользователь",
+                    message: message
+                }));
+                input.value = '';
+            }
+        } else {
+            console.error('Элемент #chat-input не найден');
+        }
+    }
+
     </script>
 </body>
 </html>

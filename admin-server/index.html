@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Панель администратора</title>
     <style>
-        body {
+body {
             font-family: Arial, sans-serif;
             background-color: #f4f4f9;
             margin: 0;
@@ -16,10 +16,19 @@
             text-align: center;
             color: #444;
         }
-        h2 {
-            color: #555;
-            border-bottom: 2px solid #007bff;
-            padding-bottom: 5px;
+        .form-container {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            max-width: 600px;
+            margin: 20px auto;
+        }
+        .form-container form {
+            margin-bottom: 20px;
+        }
+        .form-container form:last-child {
+            margin-bottom: 0;
         }
         .form-group {
             margin-bottom: 15px;
@@ -55,34 +64,47 @@
         button:hover {
             background-color: #0056b3;
         }
-        .form-container {
-            background: white;
+
+        .chat-container {
+            margin-top: 40px;
             padding: 20px;
+            background: white;
             border-radius: 8px;
             box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
             max-width: 600px;
-            margin: 20px auto;
+            margin-left: auto;
+            margin-right: auto;
         }
-        .form-container form {
-            margin-bottom: 20px;
+        .chat-container h2 {
+            margin-top: 0;
+            color: #444;
         }
-        .form-container form:last-child {
-            margin-bottom: 0;
-        }
-        .message {
-            padding: 10px;
+        #chat-messages {
+            height: 200px;
+            overflow-y: auto;
+            border: 1px solid #ccc;
             border-radius: 4px;
-            margin-top: 10px;
-            text-align: center;
-            font-weight: bold;
+            padding: 10px;
+            margin-bottom: 10px;
+            background: #f9f9f9;
         }
-        .message.success {
-            background-color: #d4edda;
-            color: #155724;
+        #chat-input {
+            width: calc(100% - 90px);
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
         }
-        .message.error {
-            background-color: #f8d7da;
-            color: #721c24;
+        button {
+            width: 80px;
+            padding: 10px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #0056b3;
         }
     </style>
 </head>
@@ -153,8 +175,14 @@
         </form>
     </div>
 
+        <div class="chat-container">
+            <h2>Чат поддержки</h2>
+            <div id="chat-messages"></div>
+            <input type="text" id="chat-input" placeholder="Введите сообщение..." />
+            <button onclick="sendMessage()">Отправить</button>
+        </div>
+
     <script>
-        // Функция для отображения сообщений
         function showMessage(element, message, isSuccess) {
             element.textContent = message;
             element.className = `message ${isSuccess ? 'success' : 'error'}`;
@@ -164,7 +192,6 @@
             }, 3000);
         }
 
-        // Обработка добавления товара
         document.getElementById('addForm').addEventListener('submit', async (e) => {
             e.preventDefault();
             const formData = new FormData(e.target);
@@ -191,7 +218,6 @@
             }
         });
 
-        // Обработка редактирования товара
         document.getElementById('editForm').addEventListener('submit', async (e) => {
             e.preventDefault();
             const formData = new FormData(e.target);
@@ -218,7 +244,6 @@
             }
         });
 
-        // Обработка удаления товара
         document.getElementById('deleteForm').addEventListener('submit', async (e) => {
             e.preventDefault();
             const formData = new FormData(e.target);
@@ -236,6 +261,46 @@
                 showMessage(messageElement, 'Ошибка при удалении товара', false);
             }
         });
+
+
+
+    const ws = new WebSocket('ws://localhost:8081');
+
+    ws.onmessage = (event) => {
+        const chatMessages = document.getElementById('chat-messages');
+        if (chatMessages) {
+            try {
+                const data = JSON.parse(event.data);
+                const message = document.createElement('div');
+                message.textContent = `${data.sender}: ${data.message}`;
+                chatMessages.appendChild(message);
+                chatMessages.scrollTop = chatMessages.scrollHeight;
+            } catch (error) {
+                const message = document.createElement('div');
+                message.textContent = event.data;
+                chatMessages.appendChild(message);
+                chatMessages.scrollTop = chatMessages.scrollHeight;
+            }
+        } else {
+            console.error('Элемент #chat-messages не найден');
+        }
+    };
+
+    function sendMessage() {
+        const input = document.getElementById('chat-input');
+        if (input) {
+            const message = input.value;
+            if (message) {
+                ws.send(JSON.stringify({
+                    sender: "Администратор",
+                    message: message
+                }));
+                input.value = '';
+            }
+        } else {
+            console.error('Элемент #chat-input не найден');
+        }
+    }
     </script>
 </body>
 </html>

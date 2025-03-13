@@ -27,7 +27,6 @@ const server = http.createServer((req, res) => {
                     res.end('Internal Server Error');
                 } else {
                     const products = JSON.parse(data);
-                    // Генерация уникального ID на сервере
                     newProduct.id = products.length > 0 ? Math.max(...products.map(p => p.id)) + 1 : 1;
                     products.push(newProduct);
                     fs.writeFile(PRODUCTS_FILE, JSON.stringify(products, null, 2), (err) => {
