@@ -20,6 +20,7 @@ node admin-server/server.js
 - URL:/products
 
 Описание: вывод товаров
+
 Ответ:
 ```
 [
@@ -56,6 +57,7 @@ node admin-server/server.js
 - URL:/add
 
 Описание: добавлние товара
+
 Тело запроса:
 ```
 {
@@ -77,6 +79,7 @@ node admin-server/server.js
 - URL:/edit
 
 Описание: обновление товара
+
 Тело запроса:
 ```
 {
@@ -98,6 +101,7 @@ node admin-server/server.js
 - URL:/delete?id=6
 
 Описание: удаление товара
+
 Тело запроса:
 Ответ:
 ```
