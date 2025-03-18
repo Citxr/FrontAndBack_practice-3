@@ -16,8 +16,8 @@ node admin-server/server.js
 
 
 # Спецификация API
-Метод GET
-URL:/products
+- Метод GET
+- URL:/products
 
 Запрос:
 ```
