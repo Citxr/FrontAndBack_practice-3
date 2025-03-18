@@ -75,7 +75,7 @@ node admin-server/server.js
 }
 ```
 
-- Метод PUL 
+- Метод PUT
 - URL:/edit
 
 Описание: обновление товара
