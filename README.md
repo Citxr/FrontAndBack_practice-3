@@ -12,3 +12,11 @@ node admin-server/server.js
 Клиентская часть доступна по 
 ```http://localhost:3000```\
 Панель администратора доступна по ```http://localhost:8080```
+
+
+
+# Спецификация API
+Метод GET
+URL:/products
+
+Запрос:
