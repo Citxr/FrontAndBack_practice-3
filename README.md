@@ -18,6 +18,7 @@ node admin-server/server.js
 # Спецификация API
 - Метод GET
 - URL:/products
+
 Описание: вывод товаров
 Ответ:
 ```
@@ -53,6 +54,7 @@ node admin-server/server.js
 
 - Метод POST 
 - URL:/add
+
 Описание: добавлние товара
 Тело запроса:
 ```
@@ -73,6 +75,7 @@ node admin-server/server.js
 
 - Метод PUL 
 - URL:/edit
+
 Описание: обновление товара
 Тело запроса:
 ```
@@ -93,6 +96,7 @@ node admin-server/server.js
 
 - Метод DELETE
 - URL:/delete?id=6
+
 Описание: удаление товара
 Тело запроса:
 Ответ:
