@@ -104,25 +104,32 @@
     </div>
 
     <script>
-        fetch('/products')
-            .then(response => response.json())
-            .then(data => {
-                const productsContainer = document.getElementById('products');
-                data.forEach(product => {
-                    const card = document.createElement('div');
-                    card.className = 'product-card';
-                    card.innerHTML = `
-                        <h3>${product.name}</h3>
-                        <p class="price">${product.price} руб.</p>
-                        <p class="description">${product.description}</p>
-                        <p class="categories">Категории: ${product.categories.join(', ')}</p>
-                    `;
-                    productsContainer.appendChild(card);
-                });
-            })
-            .catch(error => {
-                console.error('Ошибка при загрузке товаров:', error);
+    fetch('/products')
+        .then(response => response.json())
+        .then(data => {
+            const productsContainer = document.getElementById('products');
+            
+            // Добавляем информацию о сервере
+            const serverInfo = document.createElement('div');
+            serverInfo.className = 'server-info';
+            serverInfo.innerHTML = `<p>Запрос обработан сервером: Instance ${data.serverInfo.instanceId} (Port: ${data.serverInfo.port})</p>`;
+            productsContainer.appendChild(serverInfo);
+            
+            data.products.forEach(product => {
+                const card = document.createElement('div');
+                card.className = 'product-card';
+                card.innerHTML = `
+                    <h3>${product.name}</h3>
+                    <p class="price">${product.price} руб.</p>
+                    <p class="description">${product.description}</p>
+                    <p class="categories">Категории: ${product.categories.join(', ')}</p>
+                `;
+                productsContainer.appendChild(card);
             });
+        })
+        .catch(error => {
+            console.error('Ошибка при загрузке товаров:', error);
+        });
 
         const query = `
             query {
